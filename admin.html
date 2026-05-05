@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理ページ — Yukari Ando</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400&family=Noto+Serif+JP:wght@300;400;500&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FDF0F5;
+    --ink: #2d1a22;
+    --muted: #8a6070;
+    --accent: #c47fa0;
+    --line: #e8c8d8;
+    --bg: #fffafd;
+    --danger: #c46060;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Noto Serif JP', serif; min-height: 100vh; }
+
+  /* Login */
+  .login-overlay { position: fixed; inset: 0; background: var(--cream); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .login-overlay.hidden { display: none; }
+  .login-box { background: white; padding: 3rem 2.5rem; border-radius: 4px; box-shadow: 0 4px 24px rgba(45, 26, 34, 0.08); width: 100%; max-width: 400px; }
+  .login-box h1 { font-family: 'Cinzel', serif; font-size: 1.4rem; letter-spacing: 0.2em; margin-bottom: 0.4rem; }
+  .login-box .subtitle { font-size: 0.7rem; letter-spacing: 0.3em; color: var(--muted); margin-bottom: 2rem; }
+  .login-box input { width: 100%; padding: 0.85rem 1rem; border: 0.5px solid var(--line); background: var(--bg); font-family: 'Noto Serif JP', serif; margin-bottom: 1rem; font-size: 0.9rem; }
+  .login-box input:focus { outline: none; border-color: var(--accent); }
+  .login-box button { width: 100%; padding: 0.85rem; background: var(--ink); color: var(--cream); border: none; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.25em; }
+  .login-box button:hover { background: var(--accent); }
+  .login-error { color: var(--danger); font-size: 0.75rem; margin-top: 0.5rem; display: none; }
+  .login-hint { font-size: 0.7rem; color: var(--muted); margin-top: 1.5rem; line-height: 1.7; }
+
+  /* Header */
+  header { border-bottom: 0.5px solid var(--line); padding: 1.1rem 2rem; background: white; position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  .brand { font-family: 'Cinzel', serif; font-size: 1.05rem; letter-spacing: 0.2em; }
+  .brand span { display: block; font-size: 0.6rem; color: var(--muted); letter-spacing: 0.3em; margin-top: 2px; font-family: 'Noto Serif JP', serif; }
+  .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0.5rem; padding: 0.6rem 2rem 0; border-bottom: 0.5px solid var(--line); background: white; flex-wrap: wrap; }
+  .tab-btn { padding: 0.7rem 1.4rem; border: none; background: none; cursor: pointer; font-family: 'Noto Serif JP', serif; font-size: 0.85rem; letter-spacing: 0.1em; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--accent); }
+
+  .container { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+  .panel-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-style: italic; }
+  .panel-desc { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+
+  /* Buttons */
+  .btn { padding: 0.6rem 1.1rem; background: var(--ink); color: var(--cream); border: none; cursor: pointer; font-family: 'Noto Serif JP', serif; font-size: 0.78rem; letter-spacing: 0.08em; border-radius: 3px; transition: background 0.2s; }
+  .btn:hover { background: var(--accent); }
+  .btn-outline { background: white; color: var(--ink); border: 0.5px solid var(--line); }
+  .btn-outline:hover { background: var(--cream); color: var(--ink); }
+  .btn-danger { background: white; color: var(--danger); border: 0.5px solid var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: white; }
+  .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.7rem; }
+  .btn-accent { background: var(--accent); }
+  .btn-accent:hover { background: var(--ink); }
+
+  /* List */
+  .item-list { background: white; border: 0.5px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .item-row { padding: 1.1rem 1.4rem; border-bottom: 0.5px solid var(--line); display: grid; gap: 0.4rem; }
+  .item-row:last-child { border-bottom: none; }
+  .item-row-news { grid-template-columns: 100px 90px 1fr auto; gap: 1rem; align-items: start; }
+  .item-row-event { grid-template-columns: 130px 1fr 90px auto; gap: 1rem; align-items: center; }
+  .item-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .item-meta { font-family: 'Cormorant Garamond', serif; color: var(--muted); font-size: 0.85rem; font-style: italic; }
+  .item-cat { display: inline-block; font-size: 0.6rem; letter-spacing: 0.18em; color: var(--accent); border: 0.5px solid var(--accent); padding: 0.15rem 0.5rem; text-align: center; }
+  .item-headline { font-size: 0.9rem; margin-bottom: 0.2rem; line-height: 1.5; }
+  .item-body-preview { font-size: 0.74rem; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.6; }
+  .empty-state { padding: 3rem; text-align: center; color: var(--muted); font-size: 0.85rem; background: white; border: 0.5px dashed var(--line); border-radius: 4px; }
+  .month-divider { padding: 0.5rem 1.4rem; background: var(--cream); font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--muted); font-size: 0.85rem; letter-spacing: 0.05em; border-bottom: 0.5px solid var(--line); }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; background: rgba(45, 26, 34, 0.4); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
+  .modal.open { display: flex; }
+  .modal-content { background: white; border-radius: 4px; padding: 2rem; width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(45, 26, 34, 0.2); }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--line); }
+  .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-style: italic; }
+  .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--muted); line-height: 1; padding: 0 0.5rem; }
+  .form-group { margin-bottom: 1.1rem; }
+  .form-label { display: block; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 0.5rem; font-weight: 500; }
+  .form-input, .form-select, .form-textarea { width: 100%; padding: 0.7rem 0.9rem; border: 0.5px solid var(--line); background: var(--bg); font-family: 'Noto Serif JP', serif; font-size: 0.9rem; color: var(--ink); }
+  .form-textarea { min-height: 110px; resize: vertical; line-height: 1.7; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; }
+  .form-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.5rem; padding-top: 1.2rem; border-top: 0.5px solid var(--line); }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--ink); color: var(--cream); padding: 0.85rem 1.4rem; font-size: 0.85rem; border-radius: 4px; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 300; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { background: var(--danger); }
+
+  /* Help block */
+  .help-box { background: white; border: 0.5px solid var(--line); border-left: 3px solid var(--accent); padding: 1rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.78rem; color: var(--muted); line-height: 1.85; border-radius: 3px; }
+  .help-box strong { color: var(--ink); font-weight: 500; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    header { padding: 1rem 1.25rem; }
+    .tabs { padding: 0.4rem 1.25rem 0; }
+    .tab-btn { padding: 0.6rem 1rem; font-size: 0.78rem; }
+    .container { padding: 1.25rem; }
+    .item-row-news, .item-row-event { grid-template-columns: 1fr; gap: 0.55rem; }
+    .form-row { grid-template-columns: 1fr; }
+    .modal-content { padding: 1.5rem; }
+    .panel-header { flex-direction: column; align-items: flex-start; }
+    .panel-title { font-size: 1.5rem; }
+    .toast { left: 1rem; right: 1rem; bottom: 1rem; }
+    .header-actions .btn { font-size: 0.65rem; padding: 0.45rem 0.7rem; }
+    .brand { font-size: 0.95rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Login Overlay -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h1>Yukari Ando</h1>
+    <p class="subtitle">ADMIN LOGIN</p>
+    <input type="password" id="loginPassword" placeholder="パスワード" autocomplete="current-password" />
+    <button id="loginBtn">LOGIN</button>
+    <p class="login-error" id="loginError">パスワードが違います</p>
+  </div>
+</div>
+
+<header>
+  <div class="brand">
+    Admin <span>管理ページ</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-outline btn-sm" id="exportBtn">JSONバックアップ</button>
+    <button class="btn btn-outline btn-sm" id="importBtn">JSONインポート</button>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+    <button class="btn btn-accent btn-sm" id="generateBtn">HTML出力</button>
+    <input type="file" id="htmlPicker" accept=".html,text/html" style="display:none">
+    <button class="btn btn-outline btn-sm" id="logoutBtn">ログアウト</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="news">News</button>
+  <button class="tab-btn" data-tab="schedule">Schedule</button>
+  <button class="tab-btn" data-tab="help">使い方</button>
+</div>
+
+<div class="container">
+  <!-- News -->
+  <div class="panel active" id="panel-news">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">News</h2>
+        <p class="panel-desc">ニュース・お知らせを管理します。日付の新しい順に表示されます。</p>
+      </div>
+      <button class="btn" id="addNewsBtn">+ 新規追加</button>
+    </div>
+    <div class="item-list" id="newsList"></div>
+  </div>
+
+  <!-- Schedule -->
+  <div class="panel" id="panel-schedule">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Schedule</h2>
+        <p class="panel-desc">公演スケジュールを管理します。日付順に月ごとにグループ化されます。</p>
+      </div>
+      <button class="btn" id="addEventBtn">+ 新規追加</button>
+    </div>
+    <div class="item-list" id="scheduleList"></div>
+  </div>
+
+  <!-- Help -->
+  <div class="panel" id="panel-help">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">How to use</h2>
+        <p class="panel-desc">この管理ページの使い方</p>
+      </div>
+    </div>
+    <div class="help-box">
+      <p><strong>① 編集する</strong><br>「News」「Schedule」タブから項目の追加・編集・削除ができます。変更内容はブラウザ内（localStorage）に自動保存されます。</p>
+    </div>
+    <div class="help-box">
+      <p><strong>② サイトに自動反映される</strong><br><code>yukari_ando.html</code> は起動時に自動でこの管理ページと同じデータを読み込みます。ここで保存した内容は、<code>yukari_ando.html</code> を開くだけで即座に反映されます。<br>※ 両ファイルを同時に開いているときは保存と同時にリアルタイムで更新されます。<br>※ 同じブラウザ・同じPC上で使用してください。</p>
+    </div>
+    <div class="help-box">
+      <p><strong>③ バックアップ</strong><br>「JSONバックアップ」でデータをファイルに保存できます。別のPCやブラウザで作業する場合は「JSONインポート」で読み込んでください。</p>
+    </div>
+    <div class="help-box">
+      <p><strong>HTML出力（別PC用）</strong><br>別のPCで <code>yukari_ando.html</code> を公開する場合は「HTML出力」ボタンからHTMLファイルを書き出してください。</p>
+    </div>
+    <div class="help-box">
+      <p><strong>セキュリティについて</strong><br>このログイン機能は簡易的なものであり、ファイルそのものを公開すると誰でもアクセスできてしまいます。<code>admin.html</code> はサーバーに公開せず、ローカルでのみ使用することをおすすめします。</p>
+    </div>
+  </div>
+</div>
+
+<!-- News Modal -->
+<div class="modal" id="newsModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title" id="newsModalTitle">ニュース追加</h3>
+      <button class="close-btn" data-close="newsModal">&times;</button>
+    </div>
+    <input type="hidden" id="newsId">
+    <div class="form-group">
+      <label class="form-label">日付（例: 2026. 04. 30）</label>
+      <input type="text" class="form-input" id="newsDate" placeholder="2026. 04. 30">
+    </div>
+    <div class="form-group">
+      <label class="form-label">カテゴリ</label>
+      <select class="form-select" id="newsCategory">
+        <option value="CONCERT">CONCERT（公演）</option>
+        <option value="MEDIA">MEDIA（メディア）</option>
+        <option value="RELEASE">RELEASE（リリース）</option>
+        <option value="AWARD">AWARD（受賞・委嘱）</option>
+        <option value="OTHER">OTHER（その他）</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">見出し</label>
+      <input type="text" class="form-input" id="newsHeadline">
+    </div>
+    <div class="form-group">
+      <label class="form-label">本文</label>
+      <textarea class="form-textarea" id="newsBody"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" data-close="newsModal">キャンセル</button>
+      <button class="btn" id="saveNewsBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Event Modal -->
+<div class="modal" id="eventModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title" id="eventModalTitle">スケジュール追加</h3>
+      <button class="close-btn" data-close="eventModal">&times;</button>
+    </div>
+    <input type="hidden" id="eventId">
+    <div class="form-group">
+      <label class="form-label">日付</label>
+      <div class="form-row">
+        <input type="number" class="form-input" id="eventYear" placeholder="年（2026）" min="2020" max="2099">
+        <input type="number" class="form-input" id="eventMonth" placeholder="月（1〜12）" min="1" max="12">
+        <input type="number" class="form-input" id="eventDay" placeholder="日（1〜31）" min="1" max="31">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">曜日（自動）</label>
+      <input type="text" class="form-input" id="eventWeekday" readonly>
+    </div>
+    <div class="form-group">
+      <label class="form-label">公演名</label>
+      <input type="text" class="form-input" id="eventName">
+    </div>
+    <div class="form-group">
+      <label class="form-label">会場・時間</label>
+      <input type="text" class="form-input" id="eventVenue" placeholder="例: 東京文化会館 小ホール　18:30 開演">
+    </div>
+    <div class="form-group">
+      <label class="form-label">タグ</label>
+      <select class="form-select" id="eventTag">
+        <option value="SOLO">SOLO（ソロ）</option>
+        <option value="CHAMBER">CHAMBER（室内楽）</option>
+        <option value="ORCHESTRA">ORCHESTRA（オーケストラ）</option>
+        <option value="LECTURE">LECTURE（レクチャー）</option>
+        <option value="OTHER">OTHER（その他）</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" data-close="eventModal">キャンセル</button>
+      <button class="btn" id="saveEventBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ========== Constants ==========
+  const ADMIN_PASSWORD = 'yukari2026'; // 必要に応じて変更してください
+  const STORAGE_KEY = 'yukari_ando_data_v1';
+  const SESSION_KEY = 'yukari_ando_admin_session';
+
+  // ========== Default Data ==========
+  const DEFAULT_DATA = {
+    news: [
+      { id: 'n1', date: '2025. 11. 20', category: 'CONCERT', headline: '東京文化会館リサイタル、チケット発売開始のお知らせ', body: '2026年2月14日（土）に予定している東京文化会館 小ホールでのリサイタルのチケット販売が開始されました。今回はベートーヴェンとシューベルトの後期作品を中心にお届けします。' },
+      { id: 'n2', date: '2025. 10. 05', category: 'MEDIA', headline: 'NHK-FM「リサイタル・ノヴァ」出演のご報告', body: '10月3日放送のNHK-FM「リサイタル・ノヴァ」に出演いたしました。ショパンのノクターン集を中心に演奏しました。放送は聴き逃しサービスでお聴きいただけます。' },
+      { id: 'n3', date: '2025. 09. 12', category: 'RELEASE', headline: '新アルバム「夜想曲 — Nocturnes」リリースのお知らせ', body: 'ショパンのノクターン全集を収録した新アルバム「夜想曲 — Nocturnes」を2025年11月1日にリリースします。各ストリーミングサービスおよびCD店にてお求めいただけます。' },
+      { id: 'n4', date: '2025. 08. 30', category: 'AWARD', headline: '第42回 ピティナ・ピアノコンペティション審査員就任', body: '来年度のピティナ・ピアノコンペティション（全国決勝大会）の審査員を務めることになりました。若い世代の音楽家たちとの交流を楽しみにしています。' },
+      { id: 'n5', date: '2025. 06. 18', category: 'CONCERT', headline: 'ウィーン・リサイタル、無事終演のご報告', body: '6月15日にウィーンのブラームスザールにて行ったリサイタルが無事終了いたしました。多くのお客様にご来場いただき、心より感謝申し上げます。' }
+    ],
+    schedule: [
+      { id: 'e1', year: 2026, month: 2, day: 14, weekday: 'Sat', name: '安藤ゆかり ピアノ・リサイタル', venue: '東京文化会館 小ホール　18:30 開演', tag: 'SOLO' },
+      { id: 'e2', year: 2026, month: 2, day: 22, weekday: 'Sun', name: '弦楽四重奏とピアノのための夕べ', venue: '浜離宮朝日ホール　15:00 開演', tag: 'CHAMBER' },
+      { id: 'e3', year: 2026, month: 3, day: 8,  weekday: 'Sun', name: '京都市交響楽団 定期演奏会 ソリスト出演', venue: '京都コンサートホール 大ホール　14:00 開演', tag: 'ORCHESTRA' },
+      { id: 'e4', year: 2026, month: 3, day: 21, weekday: 'Sat', name: 'マスタークラス & レクチャー', venue: '東京音楽大学　13:00 開始', tag: 'LECTURE' },
+      { id: 'e5', year: 2026, month: 3, day: 28, weekday: 'Sat', name: '北九州ソロ・リサイタル', venue: '北九州ソレイユホール　19:00 開演', tag: 'SOLO' },
+      { id: 'e6', year: 2026, month: 4, day: 12, weekday: 'Sun', name: '春のデュオ・コンサート（ヴァイオリンとピアノ）', venue: '武蔵野市民文化会館　14:00 開演', tag: 'CHAMBER' },
+      { id: 'e7', year: 2026, month: 7, day: 10, weekday: 'Fri', name: '夏のコンサート　クラリネットのしらべ', venue: '錦糸町ホール　14:00 開演', tag: 'CHAMBER' }
+    ]
+  };
+
+  // ========== State ==========
+  let data = loadData();
+
+  function loadData() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const p = JSON.parse(stored);
+        if (p && Array.isArray(p.news) && Array.isArray(p.schedule)) return p;
+      }
+    } catch (e) { console.error(e); }
+    return JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+  function saveData() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { console.error(e); }
+    // yukari_ando.html が同時に開いていればリアルタイムで反映
+    try {
+      const ch = new BroadcastChannel('yukari_ando_cms');
+      ch.postMessage({ type: 'data_updated' });
+      ch.close();
+    } catch(e) { /* BroadcastChannel未対応ブラウザは無視 */ }
+  }
+
+  // ========== Login ==========
+  function tryLogin() {
+    const pw = document.getElementById('loginPassword').value;
+    if (pw === ADMIN_PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      document.getElementById('loginOverlay').classList.add('hidden');
+      render();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  }
+  function logout() {
+    sessionStorage.removeItem(SESSION_KEY);
+    location.reload();
+  }
+  function checkSession() {
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
+      document.getElementById('loginOverlay').classList.add('hidden');
+      render();
+    }
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', tryLogin);
+  document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+
+  // ========== Tabs ==========
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + name).classList.add('active');
+    });
+  });
+
+  // ========== Helpers ==========
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+  }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.toggle('error', !!isError);
+    t.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  // ========== Render ==========
+  function render() {
+    renderNews();
+    renderSchedule();
+  }
+
+  function renderNews() {
+    const list = document.getElementById('newsList');
+    if (!data.news.length) {
+      list.innerHTML = '<div class="empty-state">まだニュースがありません。「+ 新規追加」から作成してください。</div>';
+      return;
+    }
+    const sorted = [...data.news].sort((a, b) => b.date.localeCompare(a.date));
+    list.innerHTML = sorted.map(n => `
+      <div class="item-row item-row-news">
+        <div class="item-meta">${escapeHtml(n.date)}</div>
+        <div><span class="item-cat">${escapeHtml(n.category)}</span></div>
+        <div>
+          <p class="item-headline">${escapeHtml(n.headline)}</p>
+          <p class="item-body-preview">${escapeHtml(n.body)}</p>
+        </div>
+        <div class="item-actions">
+          <button class="btn btn-outline btn-sm" data-edit-news="${n.id}">編集</button>
+          <button class="btn btn-danger btn-sm" data-delete-news="${n.id}">削除</button>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('[data-edit-news]').forEach(b => b.addEventListener('click', () => editNews(b.dataset.editNews)));
+    list.querySelectorAll('[data-delete-news]').forEach(b => b.addEventListener('click', () => deleteNews(b.dataset.deleteNews)));
+  }
+
+  function renderSchedule() {
+    const list = document.getElementById('scheduleList');
+    if (!data.schedule.length) {
+      list.innerHTML = '<div class="empty-state">まだスケジュールがありません。「+ 新規追加」から作成してください。</div>';
+      return;
+    }
+    const sorted = [...data.schedule].sort((a, b) => a.year - b.year || a.month - b.month || a.day - b.day);
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    let html = '', lastKey = '';
+    sorted.forEach(e => {
+      const key = `${e.year}-${e.month}`;
+      if (key !== lastKey) { html += `<div class="month-divider">${monthNames[e.month-1]} ${e.year}</div>`; lastKey = key; }
+      html += `
+      <div class="item-row item-row-event">
+        <div class="item-meta">${e.year}.${pad2(e.month)}.${pad2(e.day)} ${escapeHtml(e.weekday)}</div>
+        <div>
+          <p class="item-headline">${escapeHtml(e.name)}</p>
+          <p class="item-body-preview">${escapeHtml(e.venue)}</p>
+        </div>
+        <div><span class="item-cat">${escapeHtml(e.tag)}</span></div>
+        <div class="item-actions">
+          <button class="btn btn-outline btn-sm" data-edit-event="${e.id}">編集</button>
+          <button class="btn btn-danger btn-sm" data-delete-event="${e.id}">削除</button>
+        </div>
+      </div>`;
+    });
+    list.innerHTML = html;
+    list.querySelectorAll('[data-edit-event]').forEach(b => b.addEventListener('click', () => editEvent(b.dataset.editEvent)));
+    list.querySelectorAll('[data-delete-event]').forEach(b => b.addEventListener('click', () => deleteEvent(b.dataset.deleteEvent)));
+  }
+
+  // ========== News CRUD ==========
+  function openNewsModal() {
+    document.getElementById('newsModalTitle').textContent = 'ニュース追加';
+    document.getElementById('newsId').value = '';
+    const t = new Date();
+    document.getElementById('newsDate').value = `${t.getFullYear()}. ${pad2(t.getMonth()+1)}. ${pad2(t.getDate())}`;
+    document.getElementById('newsCategory').value = 'CONCERT';
+    document.getElementById('newsHeadline').value = '';
+    document.getElementById('newsBody').value = '';
+    document.getElementById('newsModal').classList.add('open');
+  }
+  function editNews(id) {
+    const n = data.news.find(x => x.id === id);
+    if (!n) return;
+    document.getElementById('newsModalTitle').textContent = 'ニュース編集';
+    document.getElementById('newsId').value = n.id;
+    document.getElementById('newsDate').value = n.date;
+    document.getElementById('newsCategory').value = n.category;
+    document.getElementById('newsHeadline').value = n.headline;
+    document.getElementById('newsBody').value = n.body;
+    document.getElementById('newsModal').classList.add('open');
+  }
+  function saveNews() {
+    const id = document.getElementById('newsId').value;
+    const item = {
+      id: id || ('n' + Date.now()),
+      date: document.getElementById('newsDate').value.trim(),
+      category: document.getElementById('newsCategory').value,
+      headline: document.getElementById('newsHeadline').value.trim(),
+      body: document.getElementById('newsBody').value.trim()
+    };
+    if (!item.date || !item.headline) { alert('日付と見出しは必須です'); return; }
+    if (id) { const i = data.news.findIndex(x => x.id === id); if (i >= 0) data.news[i] = item; }
+    else { data.news.unshift(item); }
+    saveData();
+    renderNews();
+    document.getElementById('newsModal').classList.remove('open');
+    showToast('ニュースを保存しました');
+  }
+  function deleteNews(id) {
+    if (!confirm('このニュースを削除しますか？')) return;
+    data.news = data.news.filter(x => x.id !== id);
+    saveData();
+    renderNews();
+    showToast('削除しました');
+  }
+
+  // ========== Event CRUD ==========
+  function openEventModal() {
+    document.getElementById('eventModalTitle').textContent = 'スケジュール追加';
+    document.getElementById('eventId').value = '';
+    const t = new Date();
+    document.getElementById('eventYear').value = t.getFullYear();
+    document.getElementById('eventMonth').value = t.getMonth() + 1;
+    document.getElementById('eventDay').value = t.getDate();
+    updateWeekday();
+    document.getElementById('eventName').value = '';
+    document.getElementById('eventVenue').value = '';
+    document.getElementById('eventTag').value = 'SOLO';
+    document.getElementById('eventModal').classList.add('open');
+  }
+  function editEvent(id) {
+    const e = data.schedule.find(x => x.id === id);
+    if (!e) return;
+    document.getElementById('eventModalTitle').textContent = 'スケジュール編集';
+    document.getElementById('eventId').value = e.id;
+    document.getElementById('eventYear').value = e.year;
+    document.getElementById('eventMonth').value = e.month;
+    document.getElementById('eventDay').value = e.day;
+    document.getElementById('eventWeekday').value = e.weekday;
+    document.getElementById('eventName').value = e.name;
+    document.getElementById('eventVenue').value = e.venue;
+    document.getElementById('eventTag').value = e.tag;
+    document.getElementById('eventModal').classList.add('open');
+  }
+  function updateWeekday() {
+    const y = +document.getElementById('eventYear').value;
+    const m = +document.getElementById('eventMonth').value;
+    const d = +document.getElementById('eventDay').value;
+    if (y && m && d) {
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const dt = new Date(y, m-1, d);
+      if (!isNaN(dt) && dt.getMonth() === m-1) document.getElementById('eventWeekday').value = days[dt.getDay()];
+    }
+  }
+  ['eventYear','eventMonth','eventDay'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateWeekday);
+  });
+  function saveEvent() {
+    const id = document.getElementById('eventId').value;
+    const y = +document.getElementById('eventYear').value;
+    const m = +document.getElementById('eventMonth').value;
+    const d = +document.getElementById('eventDay').value;
+    if (!y || !m || !d) { alert('日付を入力してください'); return; }
+    const item = {
+      id: id || ('e' + Date.now()),
+      year: y, month: m, day: d,
+      weekday: document.getElementById('eventWeekday').value || '',
+      name: document.getElementById('eventName').value.trim(),
+      venue: document.getElementById('eventVenue').value.trim(),
+      tag: document.getElementById('eventTag').value
+    };
+    if (!item.name) { alert('公演名を入力してください'); return; }
+    if (id) { const i = data.schedule.findIndex(x => x.id === id); if (i >= 0) data.schedule[i] = item; }
+    else { data.schedule.push(item); }
+    saveData();
+    renderSchedule();
+    document.getElementById('eventModal').classList.remove('open');
+    showToast('スケジュールを保存しました');
+  }
+  function deleteEvent(id) {
+    if (!confirm('このスケジュールを削除しますか？')) return;
+    data.schedule = data.schedule.filter(x => x.id !== id);
+    saveData();
+    renderSchedule();
+    showToast('削除しました');
+  }
+
+  // Modal wiring
+  document.getElementById('addNewsBtn').addEventListener('click', openNewsModal);
+  document.getElementById('addEventBtn').addEventListener('click', openEventModal);
+  document.getElementById('saveNewsBtn').addEventListener('click', saveNews);
+  document.getElementById('saveEventBtn').addEventListener('click', saveEvent);
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById(btn.dataset.close).classList.remove('open');
+    });
+  });
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+
+  // ========== Export / Import JSON ==========
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    downloadBlob(blob, 'yukari_ando_data.json');
+    showToast('JSONをダウンロードしました');
+  });
+  document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+  document.getElementById('importFile').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        if (!parsed || !Array.isArray(parsed.news) || !Array.isArray(parsed.schedule)) throw new Error('無効なフォーマット');
+        if (!confirm('現在のデータを上書きしてインポートします。よろしいですか？')) return;
+        data = parsed;
+        saveData();
+        render();
+        showToast('JSONをインポートしました');
+      } catch (err) {
+        showToast('JSONの読み込みに失敗: ' + err.message, true);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // ========== HTML Generation ==========
+  function buildNewsItemHTML(n) {
+    return `    <div class="news-item">
+      <div class="news-date">${escapeHtml(n.date)}</div>
+      <div>
+        <span class="news-category">${escapeHtml(n.category)}</span>
+        <p class="news-headline">${escapeHtml(n.headline)}</p>
+        <p class="news-body">${escapeHtml(n.body)}</p>
+      </div>
+    </div>`;
+  }
+  function buildEventItemHTML(e) {
+    const cls = 'event-tag' + (e.tag === 'SOLO' ? ' solo' : '');
+    return `      <div class="event-item">
+        <div class="event-day">
+          <div class="event-day-num">${pad2(e.day)}</div>
+          <div class="event-day-label">${escapeHtml(e.weekday)}</div>
+        </div>
+        <div class="event-info">
+          <p class="event-name">${escapeHtml(e.name)}</p>
+          <p class="event-venue">${escapeHtml(e.venue)}</p>
+        </div>
+        <span class="${cls}">${escapeHtml(e.tag)}</span>
+      </div>`;
+  }
+  function buildScheduleHTML() {
+    const sorted = [...data.schedule].sort((a, b) => a.year - b.year || a.month - b.month || a.day - b.day);
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const groups = []; let current = null;
+    sorted.forEach(e => {
+      const key = `${e.year}-${e.month}`;
+      if (!current || current.key !== key) { current = { key, year: e.year, month: e.month, items: [] }; groups.push(current); }
+      current.items.push(e);
+    });
+    return groups.map(g => `    <div class="month-group">
+      <p class="month-label">${monthNames[g.month-1]} ${g.year}</p>
+${g.items.map(buildEventItemHTML).join('\n')}
+    </div>`).join('\n');
+  }
+  function buildNewsHTML() {
+    return [...data.news].sort((a, b) => b.date.localeCompare(a.date)).map(buildNewsItemHTML).join('\n');
+  }
+  document.getElementById('generateBtn').addEventListener('click', () => {
+    document.getElementById('htmlPicker').click();
+  });
+  document.getElementById('htmlPicker').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const html = await file.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const newsList = doc.querySelector('.news-list');
+      if (!newsList) throw new Error('news-list セクションが見つかりません');
+      newsList.innerHTML = '\n' + buildNewsHTML() + '\n  ';
+      const scheduleList = doc.querySelector('.schedule-list');
+      if (!scheduleList) throw new Error('schedule-list セクションが見つかりません');
+      scheduleList.innerHTML = '\n' + buildScheduleHTML() + '\n  ';
+      const blob = new Blob(['<!DOCTYPE html>\n' + doc.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+      downloadBlob(blob, file.name || 'yukari_ando.html');
+      showToast('更新版 HTML をダウンロードしました');
+    } catch (err) {
+      console.error(err);
+      showToast('HTML出力に失敗: ' + err.message, true);
+      alert('HTML出力に失敗しました。\n' + err.message);
+    }
+    e.target.value = '';
+  });
+
+  // ========== Init ==========
+  checkSession();
+</script>
+
+</body>
+</html>
