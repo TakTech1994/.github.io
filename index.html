@@ -279,24 +279,6 @@
     font-weight: 200;
   }
 
-  .deco-line {
-    position: absolute;
-    top: 3rem;
-    right: 3rem;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .deco-line span {
-    display: block;
-    width: 30px;
-    height: 0.5px;
-    background: var(--accent);
-  }
-
-  .deco-line span:nth-child(2) { width: 20px; }
-  .deco-line span:nth-child(3) { width: 25px; }
 
   /* NEWS PAGE */
   .page-header {
@@ -626,10 +608,6 @@
       width: 220px !important;
       height: 290px !important;
     }
-    .deco-line {
-      top: 1.25rem;
-      right: 1.25rem;
-    }
     .hero-text {
       padding: 2.5rem 1.25rem 3rem;
       align-items: flex-start;
@@ -808,6 +786,9 @@
     }
   }
 </style>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -865,9 +846,6 @@
       </div>
     </div>
     <div class="hero-visual">
-      <div class="deco-line">
-        <span></span><span></span><span></span>
-      </div>
       <div class="hero-visual-inner">
         <img src="profile.jpg" style="width:260px;height:340px;object-fit:cover;object-position:top;" alt="安藤ゆかり">
         <p class="portrait-note">元消防士</p>
@@ -1019,12 +997,22 @@
     }
   });
 
-  // ========== CMS: admin.html と共有するデータを描画 ==========
+  // ========== CMS: Firebase Firestore からデータを取得して描画 ==========
   (function() {
+    // ★ admin.html と同じ Firebase 設定を貼り付けてください
+    const FIREBASE_CONFIG = {
+      apiKey: "★ここにAPIキーを貼り付け★",
+      authDomain: "★プロジェクトID★.firebaseapp.com",
+      projectId: "★プロジェクトID★",
+      storageBucket: "★プロジェクトID★.appspot.com",
+      messagingSenderId: "★送信者ID★",
+      appId: "★アプリID★"
+    };
+
     const STORAGE_KEY = 'yukari_ando_data_v1';
     const CHANNEL_NAME = 'yukari_ando_cms';
 
-    // admin.html と同じデフォルトデータ（localStorageが空のとき用）
+    // デフォルトデータ（Firestoreが未設定・オフライン時のフォールバック）
     const DEFAULT_DATA = {
       news: [
         { id: 'n1', date: '2025. 11. 20', category: 'CONCERT', headline: '東京文化会館リサイタル、チケット発売開始のお知らせ', body: '2026年2月14日（土）に予定している東京文化会館 小ホールでのリサイタルのチケット販売が開始されました。今回はベートーヴェンとシューベルトの後期作品を中心にお届けします。' },
@@ -1048,24 +1036,22 @@
       return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
     }
     function pad2(n) { return String(n).padStart(2, '0'); }
-
     const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-    function loadData() {
+    function getLocalData() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const p = JSON.parse(stored);
           if (p && Array.isArray(p.news) && Array.isArray(p.schedule)) return p;
         }
-      } catch(e) { console.error('CMS load error:', e); }
+      } catch(e) {}
       return JSON.parse(JSON.stringify(DEFAULT_DATA));
     }
 
-    function renderNews() {
+    function renderNews(data) {
       const el = document.getElementById('cms-news-list');
       if (!el) return;
-      const data = loadData();
       if (!data.news.length) { el.innerHTML = ''; return; }
       const sorted = [...data.news].sort((a, b) => b.date.localeCompare(a.date));
       el.innerHTML = sorted.map(n => `
@@ -1079,10 +1065,9 @@
     </div>`).join('');
     }
 
-    function renderSchedule() {
+    function renderSchedule(data) {
       const el = document.getElementById('cms-schedule-list');
       if (!el) return;
-      const data = loadData();
       if (!data.schedule.length) { el.innerHTML = ''; return; }
       const sorted = [...data.schedule].sort((a, b) => a.year - b.year || a.month - b.month || a.day - b.day);
       const groups = [];
@@ -1104,19 +1089,39 @@
       }).join("");
     }
 
-    function refresh() {
-      renderNews();
-      renderSchedule();
+    function refresh(d) {
+      renderNews(d);
+      renderSchedule(d);
     }
 
-    // ページ読み込み時に描画
-    refresh();
+    // まずローカルキャッシュ or デフォルトで即時描画
+    refresh(getLocalData());
 
-    // admin.html が同時に開いているときはリアルタイム反映（BroadcastChannel）
+    // Firebase Firestore からリアルタイム取得
+    try {
+      firebase.initializeApp(FIREBASE_CONFIG);
+      var db = firebase.firestore();
+      // onSnapshot: 管理者が保存すると全訪問者のページが自動更新される
+      db.collection('site').doc('cms').onSnapshot(function(doc) {
+        if (doc.exists) {
+          var d = doc.data();
+          if (d && Array.isArray(d.news) && Array.isArray(d.schedule)) {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch(e) {}
+            refresh(d);
+          }
+        }
+      }, function(err) {
+        console.warn('Firestore snapshot error (using local cache):', err);
+      });
+    } catch(e) {
+      console.warn('Firebase not configured, using local cache:', e.message);
+    }
+
+    // BroadcastChannel（ローカル開発時、同じPC・同じブラウザのタブ間同期）
     try {
       var bc = new BroadcastChannel(CHANNEL_NAME);
       bc.addEventListener("message", function(ev) {
-        if (ev.data && ev.data.type === "data_updated") refresh();
+        if (ev.data && ev.data.type === "data_updated") refresh(getLocalData());
       });
     } catch(e2) { /* BroadcastChannel未対応ブラウザは無視 */ }
   })();
