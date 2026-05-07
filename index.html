@@ -171,19 +171,16 @@
     font-weight: 400;
     position: relative;
     overflow: hidden;
-    transition: background 0.3s, transform 0.2s, box-shadow 0.3s, letter-spacing 0.3s;
+    transition: background 0.3s, box-shadow 0.3s;
     box-shadow: 0 2px 0 var(--accent);
   }
 
   .btn-primary:hover {
     background: var(--accent);
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(196, 127, 160, 0.4);
-    letter-spacing: 0.35em;
   }
 
   .btn-primary:active {
-    transform: translateY(1px);
     box-shadow: 0 1px 0 var(--accent);
   }
 
@@ -785,6 +782,152 @@
       letter-spacing: 0.12em;
     }
   }
+
+  .event-arrow {
+    font-size: 0.8rem;
+    color: var(--muted);
+    align-self: center;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .event-item:hover .event-arrow { color: var(--accent); transform: translateX(3px); }
+  .event-item { transition: background 0.15s; }
+  .event-item:hover { background: var(--cream); }
+
+
+  /* URL表示スタイル */
+  /* URL表示スタイル */
+  .detail-url-wrap { display: flex; align-items: baseline; gap: 1rem; margin-top: 1.5rem; padding: 0.9rem 1rem; background: var(--cream); border-left: 2px solid var(--line); }
+  .detail-url-label { display: none; }
+  .detail-url-text { font-size: 0.78rem; color: var(--accent); word-break: break-all; text-decoration: none; }
+  .detail-url-text:hover { text-decoration: underline; }
+  .news-item-url { display: block; font-size: 0.72rem; color: var(--accent); margin-top: 0.3rem; word-break: break-all; text-decoration: none; }
+  .news-item-url:hover { text-decoration: underline; }
+  /* NEWS DETAIL PAGE */
+  #page-news-detail .page-header { padding: 2rem 1.5rem 1.5rem; border-bottom: 0.5px solid var(--line); }
+  .news-detail-wrap { max-width: 900px; margin: 0 auto; padding: 1.25rem 0.75rem 2rem; }
+  .news-detail-image { width: 100%; max-height: 420px; object-fit: cover; display: block; margin-bottom: 2rem; }
+  .news-detail-meta { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .news-detail-date { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; letter-spacing: 0.15em; color: var(--muted); }
+  .news-detail-cat { font-size: 0.6rem; letter-spacing: 0.18em; color: var(--accent); border: 0.5px solid var(--accent); padding: 0.2rem 0.6rem; }
+  .news-detail-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 400; font-style: italic; line-height: 1.4; color: var(--ink); margin-bottom: 1.5rem; }
+  .news-detail-divider { border: none; border-top: 0.5px solid var(--line); margin: 1.5rem 0; }
+  .news-detail-body { font-size: 0.9rem; line-height: 2.1; color: var(--ink); white-space: pre-wrap; }
+
+  /* ニュース一覧クリック可能 */
+  .news-item { cursor: pointer; transition: background 0.15s; }
+  .news-item:hover { background: var(--cream); }
+  .news-item-arrow { font-size: 0.8rem; color: var(--muted); margin-left: auto; padding-left: 1rem; align-self: center; transition: color 0.2s, transform 0.2s; }
+  .news-item:hover .news-item-arrow { color: var(--accent); transform: translateX(3px); }
+  @media (max-width: 768px) {
+    .news-detail-wrap { padding: 0.75rem 0.75rem 1.5rem; }
+    .news-detail-title { font-size: 1.5rem; }
+    #page-news-detail .page-header { padding: 1.5rem 1.25rem 1rem; }
+  }
+
+  /* SCHEDULE ソート */
+  .schedule-controls { padding: 1.5rem 3rem 0; display: flex; gap: 0; align-items: center; flex-wrap: wrap; }
+  .schedule-filter-group { display: flex; gap: 1.5rem; flex: 1; }
+  @media (max-width: 768px) {
+    .schedule-controls { padding: 1rem 1.25rem 0; gap: 0.8rem; flex-direction: column; align-items: flex-start; }
+    .schedule-filter-group { gap: 1rem; }
+  }
+  /* SCHEDULE DETAIL PAGE */
+  #page-schedule-detail .page-header {
+    padding: 2rem 1.5rem 1.5rem;
+    border-bottom: 0.5px solid var(--line);
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--accent); }
+  .event-detail-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.25rem 0.75rem 2rem;
+  }
+  .event-detail-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+  }
+  .event-detail-tag {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    border: 0.5px solid var(--accent);
+    padding: 0.2rem 0.6rem;
+    margin-bottom: 1rem;
+  }
+  .event-detail-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.35;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  .event-detail-divider {
+    border: none;
+    border-top: 0.5px solid var(--line);
+    margin: 1.5rem 0;
+  }
+  .event-detail-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+  .event-detail-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    min-width: 60px;
+    padding-top: 0.15rem;
+  }
+  .event-detail-value { color: var(--ink); }
+  .event-detail-body {
+    font-size: 0.9rem;
+    line-height: 2;
+    color: var(--ink);
+    white-space: pre-wrap;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--cream);
+    border-left: 2px solid var(--accent);
+  }
+  .event-detail-image {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 2rem;
+  }
+
+
+
+  @media (max-width: 768px) {
+    .event-detail-wrap { padding: 0.75rem 0.75rem 1.5rem; }
+    .event-detail-title { font-size: 1.6rem; }
+    #page-schedule-detail .page-header { padding: 1.5rem 1.25rem 1rem; }
+  }
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -873,11 +1016,15 @@
       <span class="page-title-ja">スケジュール</span>
     </div>
   </div>
-  <div class="schedule-filter">
-    <button class="filter-btn active">すべて</button>
-    <button class="filter-btn">ソロ</button>
-    <button class="filter-btn">室内楽</button>
-    <button class="filter-btn">レクチャー</button>
+  <div class="schedule-controls">
+    <div class="schedule-filter-group">
+      <button class="filter-btn active" data-filter="ALL">すべて</button>
+      <button class="filter-btn" data-filter="SOLO">SOLO</button>
+      <button class="filter-btn" data-filter="CHAMBER">CHAMBER</button>
+      <button class="filter-btn" data-filter="ORCHESTRA">ORCHESTRA</button>
+      <button class="filter-btn" data-filter="LECTURE">LECTURE</button>
+    </div>
+
   </div>
   <div class="schedule-list" id="cms-schedule-list"></div>
 </div>
@@ -890,52 +1037,125 @@
       <span class="page-title-ja">プロフィール</span>
     </div>
   </div>
-  <div class="profile-grid">
-    <div class="profile-visual">
-      <img src="profile.jpg" class="profile-portrait" style="display:block;object-fit:cover;object-position:top;" alt="安藤ゆかり">
-      <div class="profile-name-block">
-        <p class="profile-name-ja">安藤 ゆかり</p>
-        <p class="profile-name-en">Yukari Ando</p>
-      </div>
-    </div>
-    <div class="profile-content">
-      <div class="profile-section">
-        <p class="profile-section-label">BIOGRAPHY</p>
-        <p class="profile-text">
-          千葉県柏市出身。東京藝術大学音楽学部卒業、同大学院修了。修了時に大学院アカンサス音楽賞受賞。第36回ヤマハ管楽器新人演奏会クラリネット部門出演。2019、2020年度日本演奏連盟・宗次エンジェル基金新進演奏家国内奨学金制度奨学生。これまでにクラリネットを松元香、山本正治、三界秀実、伊藤圭、野田祐介、A.Beverariの各氏に師事。現在、神奈川フィルハーモニー管弦楽団クラリネット奏者。
-        </p>
-      </div>
-      <div class="profile-section">
-        <p class="profile-section-label">INSTRUMENTS &amp; SPECIALTY</p>
-        <div class="instruments-list">
-          <span class="instrument-tag">B♭/A クラリネット</span>
-          <span class="instrument-tag">バスクラリネット</span>
-          <span class="instrument-tag">E♭クラリネット</span>
-          <span class="instrument-tag">室内楽</span>
-          <span class="instrument-tag">オーケストラ</span>
-        </div>
-      </div>
-      <div class="profile-section">
-        <p class="profile-section-label">AWARDS &amp; ACTIVITIES</p>
-        <ul class="profile-awards">
-          <li>大学院アカンサス音楽賞受賞（東京藝術大学大学院修了時）</li>
-          <li>第36回 ヤマハ管楽器新人演奏会 クラリネット部門出演</li>
-          <li>2019・2020年度 日本演奏連盟・宗次エンジェル基金 新進演奏家国内奨学金制度 奨学生</li>
-          <li>神奈川フィルハーモニー管弦楽団 クラリネット奏者（現職）</li>
-          <li>【使用楽器】B♭/A CLARINET PRESENCE ／ Bass CLARINET PRIVILEGE LowC ／ E♭CLARINET RECITAL</li>
-        </ul>
-      </div>
+  <div id="cms-profile-content"></div>
+</div>
+
+<!-- NEWS DETAIL -->
+<div class="page" id="page-news-detail">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h2 class="page-title">News</h2>
+      <span class="page-title-ja">ニュース詳細</span>
     </div>
   </div>
+  <div class="news-detail-wrap">
+    <button class="back-btn" onclick="navigate('news')">← 一覧に戻る</button>
+    <div id="news-detail-content"></div>
+  </div>
 </div>
+
+
+<!-- SCHEDULE DETAIL -->
+<div class="page" id="page-schedule-detail">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h2 class="page-title">Schedule</h2>
+      <span class="page-title-ja">公演詳細</span>
+    </div>
+  </div>
+  <div class="event-detail-wrap">
+    <button class="back-btn" onclick="navigate('schedule')">← 一覧に戻る</button>
+    <div id="event-detail-content"></div>
+  </div>
+</div>
+
 
 <script>
   function navigate(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
     document.getElementById('page-' + page).classList.add('active');
-    document.querySelector('[data-page="' + page + '"]').classList.add('active');
+    const navLink = document.querySelector('[data-page="' + page + '"]');
+    if (navLink) navLink.classList.add('active');
+    else {
+      // 詳細ページは親ナビをアクティブに
+      const parent = page.startsWith('news') ? 'news' : 'schedule';
+      const pl = document.querySelector('[data-page="' + parent + '"]');
+      if (pl) pl.classList.add('active');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function navigateToEvent(id) {
+    // 現在のデータから対象イベントを取得
+    const stored = localStorage.getItem('yukari_ando_data_v1');
+    let scheduleData = [];
+    try {
+      const d = stored ? JSON.parse(stored) : null;
+      if (d && Array.isArray(d.schedule)) scheduleData = d.schedule;
+    } catch(e) {}
+    const ev = scheduleData.find(e => e.id === id);
+    if (!ev) return;
+
+    const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+    }
+    function pad2(n) { return String(n).padStart(2, '0'); }
+
+    const dateStr = MONTH_NAMES[ev.month - 1] + ' ' + pad2(ev.day) + ', ' + ev.year + '  ' + esc(ev.weekday);
+    let html = '';
+    if (ev.imageData) {
+      html += '<img src="' + ev.imageData + '" alt="' + esc(ev.name) + '" class="event-detail-image">';
+    }
+    html += '<div class="event-detail-date">' + dateStr + '</div>';
+    html += '<span class="event-detail-tag">' + esc(ev.tag) + '</span>';
+    html += '<h2 class="event-detail-title">' + esc(ev.name) + '</h2>';
+    html += '<hr class="event-detail-divider">';
+    html += '<div class="event-detail-row"><span class="event-detail-label">VENUE</span><span class="event-detail-value">' + esc(ev.venue) + '</span></div>';
+    if (ev.detail) {
+      html += '<div class="event-detail-body">' + esc(ev.detail) + '</div>';
+    }
+    if (ev.ticketUrl) {
+      html += '<div class="detail-url-wrap"><span class="detail-url-label">TICKET</span><a href="' + esc(ev.ticketUrl) + '" target="_blank" rel="noopener noreferrer" class="detail-url-text">' + esc(ev.ticketUrl) + '</a></div>';
+    }
+
+    document.getElementById('event-detail-content').innerHTML = html;
+    navigate('schedule-detail');
+  }
+
+  function navigateToNews(id) {
+    const stored = localStorage.getItem('yukari_ando_data_v1');
+    let newsData = [];
+    try {
+      const d = stored ? JSON.parse(stored) : null;
+      if (d && Array.isArray(d.news)) newsData = d.news;
+    } catch(e) {}
+    const n = newsData.find(x => x.id === id);
+    if (!n) return;
+
+    function esc2(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+    }
+
+    let html = '';
+    if (n.imageData) {
+      html += '<img src="' + n.imageData + '" alt="' + esc2(n.headline) + '" class="news-detail-image">';
+    }
+    html += '<div class="news-detail-meta">';
+    html += '<span class="news-detail-date">' + esc2(n.date) + '</span>';
+    html += '</div>';
+    html += '<h2 class="news-detail-title">' + esc2(n.headline) + '</h2>';
+    html += '<hr class="news-detail-divider">';
+    if (n.body) {
+      html += '<p class="news-detail-body">' + esc2(n.body) + '</p>';
+    }
+    if (n.linkUrl) {
+      html += '<div class="detail-url-wrap"><span class="detail-url-label">URL</span><a href="' + esc2(n.linkUrl) + '" target="_blank" rel="noopener noreferrer" class="detail-url-text">' + esc2(n.linkUrl) + '</a></div>';
+    }
+
+    document.getElementById('news-detail-content').innerHTML = html;
+    navigate('news-detail');
   }
 
   document.querySelectorAll('.nav-links a').forEach(a => {
@@ -945,12 +1165,18 @@
     });
   });
 
+  // スケジュール フィルター
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      if (window._cmsSetFilter) {
+        window._cmsSetFilter(btn.dataset.filter || 'ALL');
+        if (window._cmsRefresh) window._cmsRefresh();
+      }
     });
   });
+
 
   // 各文字に対応する音階（ペンタトニックスケール）
   const charNotes = {
@@ -1029,7 +1255,15 @@
         { id: 'e5', year: 2026, month: 3, day: 28, weekday: 'Sat', name: '北九州ソロ・リサイタル', venue: '北九州ソレイユホール　19:00 開演', tag: 'SOLO' },
         { id: 'e6', year: 2026, month: 4, day: 12, weekday: 'Sun', name: '春のデュオ・コンサート（ヴァイオリンとピアノ）', venue: '武蔵野市民文化会館　14:00 開演', tag: 'CHAMBER' },
         { id: 'e7', year: 2026, month: 7, day: 10, weekday: 'Fri', name: '夏のコンサート　クラリネットのしらべ', venue: '錦糸町ホール　14:00 開演', tag: 'CHAMBER' }
-      ]
+      ],
+      profile: {
+        nameJa: '安藤 ゆかり',
+        nameEn: 'Yukari Ando',
+        biography: '千葉県柏市出身。東京藝術大学音楽学部卒業、同大学院修了。修了時に大学院アカンサス音楽賞受賞。第36回ヤマハ管楽器新人演奏会クラリネット部門出演。2019、2020年度日本演奏連盟・宗次エンジェル基金新進演奏家国内奨学金制度奨学生。これまでにクラリネットを松元香、山本正治、三界秀実、伊藤圭、野田祐介、A.Beverariの各氏に師事。現在、神奈川フィルハーモニー管弦楽団クラリネット奏者。',
+        instruments: 'B♭/A クラリネット、バスクラリネット、E♭クラリネット、室内楽、オーケストラ',
+        awards: '大学院アカンサス音楽賞受賞（東京藝術大学大学院修了時）\n第36回 ヤマハ管楽器新人演奏会 クラリネット部門出演\n2019・2020年度 日本演奏連盟・宗次エンジェル基金 新進演奏家国内奨学金制度 奨学生\n神奈川フィルハーモニー管弦楽団 クラリネット奏者（現職）\n【使用楽器】B♭/A CLARINET PRESENCE ／ Bass CLARINET PRIVILEGE LowC ／ E♭CLARINET RECITAL',
+        imageUrl: 'profile.jpg'
+      }
     };
 
     function esc(s) {
@@ -1049,50 +1283,130 @@
       return JSON.parse(JSON.stringify(DEFAULT_DATA));
     }
 
+    // スケジュール表示状態
+    var scheduleFilter = 'ALL';
+    var scheduleSort   = 'DATE_ASC';
+
     function renderNews(data) {
       const el = document.getElementById('cms-news-list');
       if (!el) return;
       if (!data.news.length) { el.innerHTML = ''; return; }
       const sorted = [...data.news].sort((a, b) => b.date.localeCompare(a.date));
-      el.innerHTML = sorted.map(n => `
-    <div class="news-item">
-      <div class="news-date">${esc(n.date)}</div>
-      <div>
-        <span class="news-category">${esc(n.category)}</span>
-        <p class="news-headline">${esc(n.headline)}</p>
-        <p class="news-body">${esc(n.body)}</p>
-      </div>
-    </div>`).join('');
+      el.innerHTML = sorted.map(function(n) {
+        var bodyShort = n.body ? (n.body.length > 100 ? n.body.slice(0, 100) + '\u2026' : n.body) : '';
+        return '<div class="news-item" onclick="navigateToNews(\x27' + n.id + '\x27);" style="display:flex;align-items:flex-start;gap:0.5rem;">' +
+          '<div style="flex:1;display:grid;grid-template-columns:100px 1fr;gap:1rem;align-items:start;">' +
+          '<div class="news-date">' + esc(n.date) + '</div>' +
+          '<div><p class="news-headline">' + esc(n.headline) + '</p>' +
+          '<p class="news-body">' + esc(bodyShort) + '</p>' +
+          (n.linkUrl ? '<a href="' + esc(n.linkUrl) + '" target="_blank" rel="noopener noreferrer" class="news-item-url" onclick="event.stopPropagation();">' + esc(n.linkUrl) + '</a>' : '') +
+          '</div></div><span class="news-item-arrow">\u2192</span></div>';
+      }).join('');
     }
 
+    
     function renderSchedule(data) {
       const el = document.getElementById('cms-schedule-list');
       if (!el) return;
-      if (!data.schedule.length) { el.innerHTML = ''; return; }
-      const sorted = [...data.schedule].sort((a, b) => a.year - b.year || a.month - b.month || a.day - b.day);
-      const groups = [];
-      let cur = null;
-      sorted.forEach(e => {
-        const key = e.year + "-" + e.month;
-        if (!cur || cur.key !== key) { cur = { key, year: e.year, month: e.month, items: [] }; groups.push(cur); }
-        cur.items.push(e);
+
+      // 今日以降のみ表示
+      const today = new Date(); today.setHours(0,0,0,0);
+      let items = data.schedule.filter(function(e) {
+        return new Date(e.year, e.month - 1, e.day) >= today;
       });
-      el.innerHTML = groups.map(function(g) {
-        return "<div class=\"month-group\"><p class=\"month-label\">" + MONTH_NAMES[g.month - 1] + " " + g.year + "</p>" +
-          g.items.map(function(e) {
-            var tagCls = e.tag === "SOLO" ? " solo" : "";
-            return "<div class=\"event-item\">" +
-              "<div class=\"event-day\"><div class=\"event-day-num\">" + pad2(e.day) + "</div><div class=\"event-day-label\">" + esc(e.weekday) + "</div></div>" +
-              "<div class=\"event-info\"><p class=\"event-name\">" + esc(e.name) + "</p><p class=\"event-venue\">" + esc(e.venue) + "</p></div>" +
-              "<span class=\"event-tag" + tagCls + "\">" + esc(e.tag) + "</span></div>";
-          }).join("") + "</div>";
-      }).join("");
+
+      // フィルター
+      if (scheduleFilter !== 'ALL') {
+        items = items.filter(function(e) { return e.tag === scheduleFilter; });
+      }
+
+      // ソート
+      items = items.slice().sort(function(a, b) {
+        if (scheduleSort === 'DATE_ASC')  return a.year - b.year || a.month - b.month || a.day - b.day;
+        if (scheduleSort === 'DATE_DESC') return b.year - a.year || b.month - a.month || b.day - a.day;
+        if (scheduleSort === 'NAME')      return esc(a.name).localeCompare(esc(b.name));
+        if (scheduleSort === 'TAG')       return esc(a.tag).localeCompare(esc(b.tag));
+        return 0;
+      });
+
+      if (!items.length) { el.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--muted);font-size:0.85rem;">該当するスケジュールがありません</div>'; return; }
+
+      // 日付順のときだけ月グループ表示
+      if (scheduleSort === 'DATE_ASC' || scheduleSort === 'DATE_DESC') {
+        const groups = []; let cur = null;
+        items.forEach(function(e) {
+          const key = e.year + '-' + e.month;
+          if (!cur || cur.key !== key) { cur = { key, year: e.year, month: e.month, items: [] }; groups.push(cur); }
+          cur.items.push(e);
+        });
+        el.innerHTML = groups.map(function(g) {
+          return "<div class=\"month-group\"><p class=\"month-label\">" + MONTH_NAMES[g.month - 1] + " " + g.year + "</p>" +
+            g.items.map(function(e) { return buildEventRow(e); }).join('') + "</div>";
+        }).join('');
+      } else {
+        el.innerHTML = items.map(function(e) { return buildEventRow(e); }).join('');
+      }
+    }
+
+    function buildEventRow(e) {
+      var tagCls = e.tag === "SOLO" ? " solo" : "";
+      var ticketHtml = e.ticketUrl
+        ? '<a href="' + esc(e.ticketUrl) + '" target="_blank" rel="noopener noreferrer" class="news-item-url" onclick="event.stopPropagation();">' + esc(e.ticketUrl) + '</a>'
+        : '';
+      return "<div class=\"event-item\" onclick=\"navigateToEvent('" + e.id + "');\" style=\"cursor:pointer;\">" +
+        "<div class=\"event-day\"><div class=\"event-day-num\">" + pad2(e.day) + "</div><div class=\"event-day-label\">" + esc(e.weekday) + "</div></div>" +
+        "<div class=\"event-info\"><p class=\"event-name\">" + esc(e.name) + "</p><p class=\"event-venue\">" + esc(e.venue) + "</p>" + ticketHtml + "</div>" +
+        "<span class=\"event-tag" + tagCls + "\">" + esc(e.tag) + "</span></div>";
+    }
+
+    function renderProfile(data) {
+      const el = document.getElementById('cms-profile-content');
+      if (!el) return;
+      const p = (data.profile) || {};
+      const nameJa   = p.nameJa   || '';
+      const nameEn   = p.nameEn   || '';
+      const bio      = p.biography || '';
+      const instr    = p.instruments || '';
+      const awards   = p.awards   || '';
+      const imgUrl   = p.imageUrl || 'profile.jpg';
+
+      const instrTags = instr.split(/[、,，]/).map(s => s.trim()).filter(Boolean)
+        .map(s => '<span class="instrument-tag">' + esc(s) + '</span>').join('');
+
+      const awardItems = awards.split('\n').map(s => s.trim()).filter(Boolean)
+        .map(s => '<li>' + esc(s) + '</li>').join('');
+
+      el.innerHTML =
+        '<div class="profile-grid">' +
+          '<div class="profile-visual">' +
+            '<img src="' + esc(imgUrl) + '" class="profile-portrait" style="display:block;object-fit:cover;object-position:top;" alt="' + esc(nameJa) + '">' +
+            '<div class="profile-name-block">' +
+              '<p class="profile-name-ja">' + esc(nameJa) + '</p>' +
+              '<p class="profile-name-en">' + esc(nameEn) + '</p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="profile-content">' +
+            (bio ? '<div class="profile-section"><p class="profile-section-label">BIOGRAPHY</p><p class="profile-text">' + esc(bio) + '</p></div>' : '') +
+            (instrTags ? '<div class="profile-section"><p class="profile-section-label">INSTRUMENTS &amp; SPECIALTY</p><div class="instruments-list">' + instrTags + '</div></div>' : '') +
+            (awardItems ? '<div class="profile-section"><p class="profile-section-label">AWARDS &amp; ACTIVITIES</p><ul class="profile-awards">' + awardItems + '</ul></div>' : '') +
+          '</div>' +
+        '</div>';
     }
 
     function refresh(d) {
       renderNews(d);
       renderSchedule(d);
+      renderProfile(d);
     }
+
+    // フィルター/ソートを外部ボタンから操作できるよう window に公開
+    window._cmsSetFilter = function(f) { scheduleFilter = f; };
+    window._cmsSetSort   = function(s) { scheduleSort   = s; };
+    window._cmsRefresh   = function()  {
+      const d = getLocalData();
+      renderNews(d);
+      renderSchedule(d);
+    };
 
     // まずローカルキャッシュ or デフォルトで即時描画
     refresh(getLocalData());
